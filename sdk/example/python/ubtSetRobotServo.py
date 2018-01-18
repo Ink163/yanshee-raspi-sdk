@@ -1,62 +1,69 @@
 #!/usr/bin/python
 # _*_ coding: utf-8 -*-
-from ctypes import *
+
 
 import time
+import RobotApi
 
-ll = cdll.LoadLibrary
-api=ll("/mnt/1xrobot/lib/librobot.so")
-api.ubtRobotInitialize()
-#--------------------------------------------
-robotname="Alpha1X_8492"
-class UBTEDU_ROBOTINFO_t(Structure):
-	_fields_ = [
-		("acName", c_char*32),
-		("acIPAddr", c_char*16)
-	]
-robotinfo = pointer(UBTEDU_ROBOTINFO_t())
-ret = api.ubtRobotDiscovery(1, "sdk", robotinfo)
-if (0 != ret):
-	print ("Return value: %d" % ret)
-	exit(1)
-if (robotinfo[0].acName == robotname):
-	timeout = 0
+
+
+#------------------------------Connect-------------------------------------
+RobotApi.ubtRobotInitialize()
+
+
+robotname = "Yanshee_8F83"
+gIPAddr = "127.0.0.1"
+
+
+robotinfo = RobotApi.UBTEDU_ROBOTINFO_T()
+ret = RobotApi.ubtRobotDiscovery(1,"SDK", robotinfo)
+
+if 0 != ret:
+    print("Can not Discover Robot! Error code: %d." % ret)
+    exit(1)
+
+if robotname == robotinfo.acName:
+    timeout = 0
 else:
-	timeout = 5
-# Search the robot
-while (0 != timeout):
-	ret = api.ubtRobotDiscovery(0, "sdk", robotinfo)
-	if (0 != ret):
-		print ("Return value: %d" % ret)
+    timeout = 20
 
-	time.sleep(1)
-	timeout -= 1
 
-	print ("Name: %s" % (robotinfo[0].acName))
-	print ("IP: %s" % (robotinfo[0].acIPAddr))
-	if (robotinfo[0].acName == robotname):
-		break
-ret = api.ubtRobotConnect("sdk", "1", robotinfo[0].acIPAddr)
-if (0 != ret):
-	print ("Return value: %d" % ret)
-	exit(1)
+#Repeat searching 20 
+while(timeout!=0):
+    ret = RobotApi.ubtRobotDiscovery(0,"SDK", robotinfo)
+    if ret != 0:
+        print("Can not Discover Robot (timeout)! Error code: %d." % ret)
+        exit(timeout)
+    print("Robot Name: %s",robotinfo.acName)
+    print("Robot IP: %s",robotinfo.acIPAddr)
+    time.sleep(1)
+    timeout = timeout - 1
+    if robotinfo.acName == robotname:
+        gIPAddr = robotinfo.acIPAddr
+        break
+    
+print("gIPAddr = %s." % gIPAddr)
 
-iIndexMask=0xfffff
-class SERVOSANGLE(Structure):
-	_fields_ = [
-		("value", c_char*35)
-	]
-pcAngle=pointer(SERVOSANGLE())
-iAngleLen=sizeof(pcAngle)
-ret = api.ubtGetRobotServo(iIndexMask, pcAngle, iAngleLen)
-if (0 != ret):
-	print("Failed to call the SDK api. ret %d " % (ret))
-print ("#############################")
-print ("Sernos' angle: %s" % (pcAngle[0].value))
+ret = RobotApi.ubtRobotConnect("sdk", "1" , gIPAddr)
+if ret != 0:
+    print("Can not connect to robot. Error code: %d" % ret)
+    exit(2)
 
-pcAngle[0].value = "895A5A5A595A5B4C00B45C5968B4005D90"
-ret = api.ubtSetRobotServo(iIndexMask, pcAngle, 0)
-if (0 != ret):
-	print("Failed to call the SDK api. ret %d " % (ret))
 
-api.ubtRobotDeinitialize()
+#--------------------------Test servo 6------------------------------------
+servomasks = 0x20
+servoangle = "1E"
+ret = RobotApi.ubtSetRobotServo(servomasks,servoangle,100)
+if ret != 0:
+    print("Can not set angles for servos" % ret)
+    exit(3)
+time.sleep(1)
+ret = RobotApi.ubtSetRobotServo(servomasks,servoangle,100)
+if ret != 0:
+    print("Can not set angles for servos" % ret)
+    exit(4)
+
+#--------------------------DisConnection--------------------------------- 
+RobotApi.ubtRobotDisConnect("SDK","1",gIPAddr)
+RobotApi.ubtRobotDeinitialize()
+

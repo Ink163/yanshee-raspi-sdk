@@ -1,13 +1,12 @@
 #!/usr/bin/python
 # _*_ coding: utf-8 -*-
 
-
 import time
 import RobotApi
 
+    
 
-
-#------------------------------Connect----------------------------------------
+#------------------------------Connect-------------------------------------
 RobotApi.ubtRobotInitialize()
 
 
@@ -28,21 +27,20 @@ else:
     timeout = 20
 
 
-#Repeat searching 20 
+#Repeat searching 20
+    
 while(timeout!=0):
     ret = RobotApi.ubtRobotDiscovery(0,"SDK", robotinfo)
     if ret != 0:
         print("Can not Discover Robot (timeout)! Error code: %d." % ret)
         exit(timeout)
-    print("Robot Name: %s",robotinfo.acName)
-    print("Robot IP: %s",robotinfo.acIPAddr)
+    print("Robot Name: %s" % robotinfo.acName)
+    print("Robot IP: %s" % robotinfo.acIPAddr)
     time.sleep(1)
     timeout = timeout - 1
     if robotinfo.acName == robotname:
         gIPAddr = robotinfo.acIPAddr
         break
-    
-    
 print("gIPAddr = %s." % gIPAddr)
 
 ret = RobotApi.ubtRobotConnect("sdk", "1" , gIPAddr)
@@ -52,16 +50,22 @@ if ret != 0:
 
 
 
-#-----------------------------ReportStatusToApp---------------------------------
-pcName = "Test code:"
-pcString="This is a test"
-ret = RobotApi.ubtReportStatusToApp(pcName,pcString)
-if ret != 0:
-    print(" Can not give upload status to app. Error Code: %d" % ret)
-print("Current status code: %d" % ret)
+
+
+#-----------------------Cheak App Status-------------------------
+pcBuf = ["static","slant_forward","slant_backward","slant_left","slant_right","swaying"]
+iWaitTime = 100
+#ret = RobotApi.ubtCheckAPPStatus(pcBuf,iWaitTime)
+for buff in pcBuf:
+    ret = RobotApi.ubtCheckAPPStatus(buff,iWaitTime)
+    if ret != 0:
+        print("Can not checkAppStatus. Error code: %d" % ret)
+        exit(3)
+    else:
+        print("pcBuf: %s" % buff)
 
 
 
-#--------------------------DisConnection--------------------------------- 
+#---------------------------Disconnect--------------------------------------
 RobotApi.ubtRobotDisconnect("SDK","1",gIPAddr)
 RobotApi.ubtRobotDeinitialize()

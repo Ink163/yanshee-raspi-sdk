@@ -1,13 +1,13 @@
 #!/usr/bin/python
 # _*_ coding: utf-8 -*-
 
-
 import time
 import RobotApi
 
 
 
-#------------------------------Connect----------------------------------------
+
+#------------------------------Connect-------------------------------------
 RobotApi.ubtRobotInitialize()
 
 
@@ -42,7 +42,6 @@ while(timeout!=0):
         gIPAddr = robotinfo.acIPAddr
         break
     
-    
 print("gIPAddr = %s." % gIPAddr)
 
 ret = RobotApi.ubtRobotConnect("sdk", "1" , gIPAddr)
@@ -52,16 +51,15 @@ if ret != 0:
 
 
 
-#-----------------------------ReportStatusToApp---------------------------------
-pcName = "Test code:"
-pcString="This is a test"
-ret = RobotApi.ubtReportStatusToApp(pcName,pcString)
+#-------------------------------Set Robot Volume (0-100)--------------------------------
+RobotVolume = 50
+ret = RobotApi.ubtSetRobotVolume(RobotVolume)
 if ret != 0:
-    print(" Can not give upload status to app. Error Code: %d" % ret)
-print("Current status code: %d" % ret)
+    print("Can not set volume for robot! Error Code: %d" % ret)
+    exit(4)
 
 
 
-#--------------------------DisConnection--------------------------------- 
+#--------------------------DisConnection---------------------------------            
 RobotApi.ubtRobotDisconnect("SDK","1",gIPAddr)
 RobotApi.ubtRobotDeinitialize()

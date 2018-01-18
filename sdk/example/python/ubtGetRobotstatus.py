@@ -1,10 +1,9 @@
 #!/usr/bin/python
 # _*_ coding: utf-8 -*-
 
+
 import time
 import RobotApi
-import sys
-#from ctypes import *
 
     
 
@@ -53,19 +52,28 @@ if ret != 0:
 
 
 
-
-#---------------------------Read Sensor Value-------------------------------
-#-----------------Only have infrared sensor on Yanshee_8F83-----------------
-pcSensorType = "infrared"
-infrared_sensor = RobotApi.UBTEDU_ROBOTINFRARED_SENSOR_T()
-print("Sensor: INFRARED \t Value: %d" % infrared_sensor.iValue)
-RobotApi.ubtReadSensorValue(pcSensorType,infrared_sensor,4)# Use ctypes size for sensor
+#-----------------------------Getrobotstatus---------------------------------
+#-----------------------------Volumeinformation------------------------------
+status_info = RobotApi.UBTEDU_ROBOTINFRARED_SENSOR_T()
+#status_info = RobotApi.UBTEDU_ROBOT_Battery_T()
+#StatusList=[1,2,3,4,5,6]
+print("Initialization Value: %d" % status_info.iValue)
+ret = RobotApi.ubtGetRobotStatus(2,status_info)
 if ret != 0:
-    print("Can not read infrared sensor. Error code: %d" % ret)
-    exit(3)
+    print("Can not get volume information. Error code: %d" % ret)
+    exit(4)
 else:
-    print("Sensor: INFRARED(Distance) \t Value: %d mm" % infrared_sensor.iValue)
-
+    print("Value: %d" % status_info.iValue)
+#battery_info = int()
+#for status in StatusList:
+ #   print("status:%d \t value(init): %d" % (status,status_info.iValue))
+  #  ret = RobotApi.ubtGetRobotStatus(status,status_info)
+   # if ret != 0:
+    #    print("status:%d \t Can not get information. Error code: %d" % (status,ret))
+        #exit(3)
+     #   continue
+    #for value in status_info.iValue:
+     #   print("status:%d \t Value: %d" % (status,value))
 
 
 

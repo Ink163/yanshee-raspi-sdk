@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # _*_ coding: utf-8 -*-
 
-
 import time
 import RobotApi
 
@@ -42,7 +41,6 @@ while(timeout!=0):
         gIPAddr = robotinfo.acIPAddr
         break
     
-    
 print("gIPAddr = %s." % gIPAddr)
 
 ret = RobotApi.ubtRobotConnect("sdk", "1" , gIPAddr)
@@ -52,16 +50,22 @@ if ret != 0:
 
 
 
-#-----------------------------ReportStatusToApp---------------------------------
-pcName = "Test code:"
-pcString="This is a test"
-ret = RobotApi.ubtReportStatusToApp(pcName,pcString)
+
+
+#--------------------------------VisionDetect-------------------------------
+pcVisionType = str("face")
+iTimeout = 100
+pcValue = str("1111111111111111111111111111111111")
+ret = RobotApi.ubtVisionDetect(pcVisionType,pcValue,iTimeout)
 if ret != 0:
-    print(" Can not give upload status to app. Error Code: %d" % ret)
-print("Current status code: %d" % ret)
+    print("Can not detect vision. Error code: %d" % ret)
+    exit(3)
+print("pcValue: %s" % pcValue)
 
 
 
-#--------------------------DisConnection--------------------------------- 
+
+
+#--------------------------DisConnect--------------------------------- 
 RobotApi.ubtRobotDisconnect("SDK","1",gIPAddr)
 RobotApi.ubtRobotDeinitialize()

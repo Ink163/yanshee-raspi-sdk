@@ -9,7 +9,7 @@ RobotApi.ubtRobotInitialize()
 #--------------------------------------------
 
 #The robot name you want to connect
-robotname="Yanshee_70C2"
+robotname="Yanshee_8F83"
 gIPAddr = "127.0.0.1"
 
 robotinfo = RobotApi.UBTEDU_ROBOTINFO_T()
